@@ -98,10 +98,10 @@
         .profit { color: var(--profit-green); font-weight: 600; }
         .loss { color: var(--loss-red); font-weight: 600; }
 
-        /* UPGRADED CRISP DIRECTION TAGS */
+        /* Tags (Non-Capitalized, sleek Title Case) */
         .tag { 
-            padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; 
-            letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; display: inline-block;
+            padding: 4px 10px; border-radius: 4px; font-size: 11.5px; font-weight: 600; 
+            letter-spacing: 0.3px; white-space: nowrap; display: inline-block; text-transform: capitalize;
         }
         .tag.long { color: #26a69a; background-color: rgba(38, 166, 154, 0.15); border: 1px solid rgba(38, 166, 154, 0.2); }
         .tag.short { color: #ef5350; background-color: rgba(239, 83, 80, 0.15); border: 1px solid rgba(239, 83, 80, 0.2); }
@@ -137,7 +137,7 @@
         .form-row .form-group { flex: 1; }
         label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-muted); }
         
-        /* HIDDEN SPINNERS FOR NUMBERS */
+        /* Hidden Spinners */
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
@@ -145,7 +145,7 @@
         input, select, textarea { width: 100%; padding: 10px; background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 4px; font-family: var(--font-family); }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--text-muted); }
 
-        /* DARK CUSTOM CHECKBOX */
+        /* Custom Checkbox */
         .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-main); font-size: 14px; user-select: none; padding: 8px; background: var(--hover-bg); border-radius: 4px; border: 1px solid var(--border-color); }
         .checkbox-label input[type="checkbox"] {
             appearance: none; -webkit-appearance: none; width: 18px; height: 18px; padding: 0;
@@ -159,11 +159,13 @@
 
         .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
 
-        /* Custom Section Titles inside Settings */
         .section-title {
             font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); 
             margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;
         }
+
+        /* Image Paste Hint */
+        .paste-hint { font-size: 11px; font-weight: 400; color: var(--text-muted); margin-left: 4px; }
 
         /* Lightbox */
         .lightbox { display: none; position: fixed; z-index: 4000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(5px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
@@ -352,13 +354,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Image 1 URL (e.g., Entry / Higher Timeframe)</label>
-                    <input type="url" id="tradeImage1Url" placeholder="https://...">
+                    <label>Image 1 (Entry / HTF) <span class="paste-hint">(URL or press Ctrl+V to paste)</span></label>
+                    <input type="text" id="tradeImage1Url" placeholder="Enter image URL or paste image here...">
                 </div>
 
                 <div class="form-group">
-                    <label>Image 2 URL (e.g., Exit / Lower Timeframe)</label>
-                    <input type="url" id="tradeImage2Url" placeholder="https://...">
+                    <label>Image 2 (Exit / LTF) <span class="paste-hint">(URL or press Ctrl+V to paste)</span></label>
+                    <input type="text" id="tradeImage2Url" placeholder="Enter image URL or paste image here...">
                 </div>
 
                 <div class="form-group"><label>Notes / Lessons</label><textarea id="tradeNotes" rows="2"></textarea></div>
@@ -371,7 +373,7 @@
         const placeholderImg = 'https://via.placeholder.com/800x400/131722/787b86?text=No+Chart+Provided';
 
         const dummyTrades =[
-            { id: 1, date: '2026-03-01', asset: 'NIFTY50', isSetupOnly: false, direction: 'Long', setup: 'Double Bottom', qty: 50, entry: 22500, sl: 22400, exit: 22650, fees: 50.00, rrr: "1.50R", pnl: 7450.00, image1: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=800', image2: '', notes: 'Perfect double bottom.' },
+            { id: 1, date: '2026-03-01', asset: 'NIFTY50', isSetupOnly: false, direction: 'Long', setup: 'Double Bottom', qty: 50, entry: 22500, sl: 22400, exit: 22650, fees: 50.00, rrr: "1.50R", pnl: 7450.00, image1: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=800', image2: '', notes: 'Perfect double bottom.' }
         ];
 
         // Safe Load & Mapping
@@ -396,7 +398,7 @@
         let editingTradeId = null;
         let currentVaultFilter = 'All'; let currentTableFilter = 'All'; 
 
-        function init() { renderUI(); toggleExecutionFields(); setupAutoFeeCalc(); }
+        function init() { renderUI(); toggleExecutionFields(); setupAutoFeeCalc(); setupPasteListeners(); }
         function renderUI() { renderTable(); renderGallery(); updateStats(); saveData(); }
 
         const formatMoney = (amount) => (amount === '' || amount == null || isNaN(amount)) ? '' : (parseFloat(amount) >= 0 ? '+₹' : '-₹') + Math.abs(parseFloat(amount)).toFixed(2);
@@ -555,11 +557,14 @@
             tradeExecutionFields.style.display = isSetupOnlyCb.checked ? 'none' : 'block';['tradeDirection', 'tradeEntry', 'tradeExit', 'tradeQty'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.required = !isSetupOnlyCb.checked;
-            });['tradeSl', 'tradeFees'].forEach(id => {
+            });
+            
+            ['tradeSl', 'tradeFees'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.required = false; 
             });
         }
+        
         isSetupOnlyCb.addEventListener('change', toggleExecutionFields);
 
         // Auto-Calculate Fees Logic
@@ -589,7 +594,49 @@
             });
         }
 
-        // Settings Modal UI
+        // --- Clipboard Paste Logic (No Previews) ---
+        let pastedImages = { 1: '', 2: '' };
+
+        function setupPasteListeners() {
+            [1, 2].forEach(index => {
+                const inputEl = document.getElementById(`tradeImage${index}Url`);
+                
+                // Handle actual Clipboard paste
+                inputEl.addEventListener('paste', (e) => {
+                    const clipboardData = e.clipboardData || window.clipboardData;
+                    if (!clipboardData) return;
+                    
+                    for (let item of clipboardData.items) {
+                        if (item.type.indexOf('image/') === 0) {
+                            e.preventDefault(); // Stop normal text paste
+                            const file = item.getAsFile();
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                                const base64 = event.target.result;
+                                pastedImages[index] = base64;
+                                inputEl.value = '[Pasted Image]'; // Hide massive string, act as indicator
+                            };
+                            reader.readAsDataURL(file);
+                            return; // Done
+                        }
+                    }
+                });
+
+                // If user clears the "[Pasted Image]" text, clear the stored base64 data
+                inputEl.addEventListener('input', () => {
+                    if (inputEl.value !== '[Pasted Image]') {
+                        pastedImages[index] = ''; 
+                    }
+                });
+            });
+        }
+
+        window.clearImage = (index) => {
+            pastedImages[index] = '';
+            document.getElementById(`tradeImage${index}Url`).value = '';
+        };
+
+        // --- Settings / Cloud UI ---
         function updateSyncStatusUI() {
             const statusEl = document.getElementById('syncStatus');
             if (feeSettings.sheetUrl && feeSettings.sheetUrl.trim() !== '') {
@@ -674,8 +721,9 @@
                 }
             }
 
-            let finalImg1 = document.getElementById('tradeImage1Url').value.trim();
-            let finalImg2 = document.getElementById('tradeImage2Url').value.trim();
+            // Extract correct image values (URL vs Base64)
+            let finalImg1 = document.getElementById('tradeImage1Url').value === '[Pasted Image]' ? pastedImages[1] : document.getElementById('tradeImage1Url').value.trim();
+            let finalImg2 = document.getElementById('tradeImage2Url').value === '[Pasted Image]' ? pastedImages[2] : document.getElementById('tradeImage2Url').value.trim();
 
             const tradeData = {
                 id: editingTradeId || Date.now(),
@@ -694,8 +742,11 @@
 
             syncToGoogleSheets(tradeData, 'save');
 
-            document.getElementById('modalOverlay').style.display = 'none'; document.getElementById('tradeForm').reset();
-            editingTradeId = null; toggleExecutionFields(); renderUI();
+            document.getElementById('modalOverlay').style.display = 'none'; 
+            document.getElementById('tradeForm').reset();
+            editingTradeId = null; 
+            toggleExecutionFields(); 
+            renderUI();
         });
 
         window.editTrade = (id) => {
@@ -707,12 +758,24 @@
             document.getElementById('tradeEntry').value = t.entry || ''; document.getElementById('tradeSl').value = t.sl || ''; document.getElementById('tradeExit').value = t.exit || '';
             document.getElementById('tradeFees').value = t.fees || '';
             
-            // If legacy data has Base64, don't shove a massive string into the URL box.
-            document.getElementById('tradeImage1Url').value = (t.image1 && !t.image1.startsWith('data:image')) ? t.image1 : ''; 
-            document.getElementById('tradeImage2Url').value = (t.image2 && !t.image2.startsWith('data:image')) ? t.image2 : ''; 
+            // Re-bind Images correctly
+            [1, 2].forEach(index => {
+                const src = t[`image${index}`];
+                if (src && src.startsWith('data:image')) {
+                    pastedImages[index] = src;
+                    document.getElementById(`tradeImage${index}Url`).value = '[Pasted Image]';
+                } else if (src) {
+                    document.getElementById(`tradeImage${index}Url`).value = src;
+                } else {
+                    clearImage(index);
+                }
+            });
             
             document.getElementById('tradeNotes').value = t.notes || '';
-            toggleExecutionFields(); document.getElementById('modalTitle').textContent = 'Edit Log'; document.getElementById('saveBtn').textContent = 'Update Journal'; document.getElementById('modalOverlay').style.display = 'flex';
+            toggleExecutionFields(); 
+            document.getElementById('modalTitle').textContent = 'Edit Log'; 
+            document.getElementById('saveBtn').textContent = 'Update Journal'; 
+            document.getElementById('modalOverlay').style.display = 'flex';
         };
 
         window.deleteTrade = (id) => { 
@@ -729,33 +792,111 @@
         document.getElementById('exportBtnModal').addEventListener('click', async () => {
             if(trades.length === 0) return alert("No data to export.");
             const dataStr = JSON.stringify(trades, null, 2);
-            try { if (window.showSaveFilePicker) { const handle = await window.showSaveFilePicker({ suggestedName: 'trading_backup.json', types:[{ description: 'JSON Backup', accept: {'application/json':['.json']} }] }); const writable = await handle.createWritable(); await writable.write(dataStr); await writable.close(); } else { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([dataStr], { type: "application/json" })); a.download = 'trading_backup.json'; a.click(); } } catch (err) { if (err.name !== 'AbortError') alert("Export failed: " + err.message); }
+            try { 
+                if (window.showSaveFilePicker) { 
+                    const handle = await window.showSaveFilePicker({ suggestedName: 'trading_backup.json', types:[{ description: 'JSON Backup', accept: {'application/json':['.json']} }] }); 
+                    const writable = await handle.createWritable(); 
+                    await writable.write(dataStr); 
+                    await writable.close(); 
+                } else { 
+                    const a = document.createElement('a'); 
+                    a.href = URL.createObjectURL(new Blob([dataStr], { type: "application/json" })); 
+                    a.download = 'trading_backup.json'; 
+                    a.click(); 
+                } 
+            } catch (err) { 
+                if (err.name !== 'AbortError') alert("Export failed: " + err.message); 
+            }
         });
+        
         document.getElementById('importBtnModal').addEventListener('click', () => document.getElementById('importFile').click());
-        document.getElementById('importFile').addEventListener('change', (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { try { const data = JSON.parse(ev.target.result); if (Array.isArray(data) && confirm("Overwrite current journal data?")) { trades = data; renderUI(); alert('Restored!'); } } catch (err) { alert('Invalid backup file.'); } }; reader.readAsText(file); e.target.value = ''; });
+        document.getElementById('importFile').addEventListener('change', (e) => { 
+            const file = e.target.files[0]; 
+            if (!file) return; 
+            const reader = new FileReader(); 
+            reader.onload = (ev) => { 
+                try { 
+                    const data = JSON.parse(ev.target.result); 
+                    if (Array.isArray(data) && confirm("Overwrite current journal data?")) { 
+                        trades = data; 
+                        renderUI(); 
+                        alert('Restored!'); 
+                    } 
+                } catch (err) { 
+                    alert('Invalid backup file.'); 
+                } 
+            }; 
+            reader.readAsText(file); 
+            e.target.value = ''; 
+        });
 
-        document.querySelectorAll('.tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('.tab, .view-container').forEach(el => el.classList.remove('active')); tab.classList.add('active'); document.getElementById(tab.dataset.target).classList.add('active'); }); });
-        document.querySelectorAll('#tableFilters .filter-btn').forEach(btn => btn.addEventListener('click', (e) => { document.querySelectorAll('#tableFilters .filter-btn').forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentTableFilter = e.target.dataset.filter; renderTable(); }));
-        document.querySelectorAll('#vaultFilters .filter-btn').forEach(btn => btn.addEventListener('click', (e) => { document.querySelectorAll('#vaultFilters .filter-btn').forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentVaultFilter = e.target.dataset.filter; renderGallery(); }));
+        document.querySelectorAll('.tab').forEach(tab => { 
+            tab.addEventListener('click', () => { 
+                document.querySelectorAll('.tab, .view-container').forEach(el => el.classList.remove('active')); 
+                tab.classList.add('active'); 
+                document.getElementById(tab.dataset.target).classList.add('active'); 
+            }); 
+        });
+        
+        document.querySelectorAll('#tableFilters .filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => { 
+                document.querySelectorAll('#tableFilters .filter-btn').forEach(b => b.classList.remove('active')); 
+                e.target.classList.add('active'); 
+                currentTableFilter = e.target.dataset.filter; 
+                renderTable(); 
+            })
+        });
+
+        document.querySelectorAll('#vaultFilters .filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => { 
+                document.querySelectorAll('#vaultFilters .filter-btn').forEach(b => b.classList.remove('active')); 
+                e.target.classList.add('active'); 
+                currentVaultFilter = e.target.dataset.filter; 
+                renderGallery(); 
+            })
+        });
 
         const lightbox = document.getElementById('lightbox'), lightboxImg = document.getElementById('lightboxImg');
         const lbPrev = document.getElementById('lightboxPrev'), lbNext = document.getElementById('lightboxNext'), lbInd = document.getElementById('lightboxIndicator');
         let lbImages =[], lbIndex = 0;
-        window.openLightbox = (img1, img2, startIdx = 0) => { lbImages =[img1, img2].filter(i => i && i.trim() !== ''); if(lbImages.length === 0) return; lbIndex = (startIdx < lbImages.length) ? startIdx : 0; updateLightboxView(); lightbox.classList.add('show'); };
-        function updateLightboxView() { lightboxImg.src = lbImages[lbIndex]; if(lbImages.length > 1) { lbPrev.style.display = 'block'; lbNext.style.display = 'block'; lbInd.style.display = 'block'; lbInd.textContent = `${lbIndex + 1} / ${lbImages.length}`; } else { lbPrev.style.display = 'none'; lbNext.style.display = 'none'; lbInd.style.display = 'none'; } }
+        
+        window.openLightbox = (img1, img2, startIdx = 0) => { 
+            lbImages =[img1, img2].filter(i => i && i.trim() !== ''); 
+            if(lbImages.length === 0) return; 
+            lbIndex = (startIdx < lbImages.length) ? startIdx : 0; 
+            updateLightboxView(); 
+            lightbox.classList.add('show'); 
+        };
+        
+        function updateLightboxView() { 
+            lightboxImg.src = lbImages[lbIndex]; 
+            if(lbImages.length > 1) { 
+                lbPrev.style.display = 'block'; 
+                lbNext.style.display = 'block'; 
+                lbInd.style.display = 'block'; 
+                lbInd.textContent = `${lbIndex + 1} / ${lbImages.length}`; 
+            } else { 
+                lbPrev.style.display = 'none'; 
+                lbNext.style.display = 'none'; 
+                lbInd.style.display = 'none'; 
+            } 
+        }
+        
         lbNext.addEventListener('click', (e) => { e.stopPropagation(); lbIndex = (lbIndex + 1) % lbImages.length; updateLightboxView(); });
         lbPrev.addEventListener('click', (e) => { e.stopPropagation(); lbIndex = (lbIndex - 1 + lbImages.length) % lbImages.length; updateLightboxView(); });
+        
         const closeLb = () => { lightbox.classList.remove('show'); setTimeout(() => lightboxImg.src='', 200); };
-        document.getElementById('lightboxClose').addEventListener('click', closeLb); lightbox.addEventListener('click', (e) => { if(e.target===lightbox || e.target===lightboxImg) closeLb(); });
-
-        ['modalOverlay', 'settingsModalOverlay'].forEach(id => {
+        document.getElementById('lightboxClose').addEventListener('click', closeLb); 
+        lightbox.addEventListener('click', (e) => { if(e.target===lightbox || e.target===lightboxImg) closeLb(); });['modalOverlay', 'settingsModalOverlay'].forEach(id => {
             document.getElementById(id).addEventListener('click', (e) => { if(e.target.id === id) e.target.style.display = 'none'; });
         });
+        
         document.getElementById('closeModalBtn').addEventListener('click', () => document.getElementById('modalOverlay').style.display='none');
         document.getElementById('closeSettingsBtn').addEventListener('click', () => document.getElementById('settingsModalOverlay').style.display='none');
 
         document.getElementById('openModalBtn').addEventListener('click', () => { 
             document.getElementById('tradeForm').reset(); 
+            clearImage(1); clearImage(2); // Reset images
             editingTradeId = null; 
             toggleExecutionFields(); 
             const tzOffset = (new Date()).getTimezoneOffset() * 60000;
