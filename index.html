@@ -5,18 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Trading Vault</title>
     
-    <!-- Custom Hexagon Vault Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 5 L88.97 27.5 L88.97 72.5 L50 95 L11.03 72.5 L11.03 27.5 Z' fill='none' stroke='%2300e5ff' stroke-width='6' stroke-linejoin='round'/><circle cx='50' cy='50' r='26' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-dasharray='4 4' opacity='0.6'/><circle cx='50' cy='50' r='18' fill='none' stroke='%2300e5ff' stroke-width='2' opacity='0.8'/><path d='M32 62 L45 50 L52 56 L66 40' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><path d='M56 40 L66 40 L66 50' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     
-    <!-- Google Fonts: Roboto -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Flatpickr -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     
@@ -196,7 +191,10 @@
         .flatpickr-calendar { background: var(--panel-bg) !important; border: 1px solid var(--border-color) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important; font-family: var(--font-family) !important; padding-bottom: 4px; }
         .flatpickr-day { color: var(--text-main) !important; transition: all 0.2s ease; border-radius: 4px !important; }
         .flatpickr-day:hover, .flatpickr-day:focus { background: rgba(0, 229, 255, 0.1) !important; border-color: rgba(0, 229, 255, 0.3) !important; color: var(--accent-neon) !important; }
-        .flatpickr-day.selected { background: rgba(0, 229, 255, 0.15) !important; color: var(--accent-neon) !important; border: 1px solid var(--accent-neon) !important; font-weight: bold; }
+        
+        /* Dimmed the selected date text to white instead of bright neon */
+        .flatpickr-day.selected { background: rgba(0, 229, 255, 0.15) !important; color: #ffffff !important; border: 1px solid var(--accent-neon) !important; font-weight: 500 !important; }
+        
         .flatpickr-day.flatpickr-disabled { color: rgba(255,255,255,0.15) !important; }
         .flatpickr-months .flatpickr-month { color: var(--text-main) !important; fill: var(--text-main) !important; }
         .flatpickr-months .flatpickr-prev-month svg, .flatpickr-months .flatpickr-next-month svg { fill: #ffffff !important; transition: fill 0.2s ease; }
@@ -218,33 +216,28 @@
         .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
         .paste-hint { font-size: 11px; font-weight: 400; color: var(--text-muted); margin-left: 4px; }
 
-        /* Windows Photos Style Lightbox Overlay & Controls */
+        /* Windows Photos Style Lightbox Overlay & Controls (Undoing the rectangles) */
         .lightbox { visibility: hidden; position: fixed; z-index: 4000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease, visibility 0.2s ease; display: flex; }
         .lightbox.show { visibility: visible; opacity: 1; }
         .lightbox-img { max-width: 95vw; max-height: 95vh; object-fit: contain; transform: scale(0.98); opacity: 0; transition: transform 0.2s ease, opacity 0.2s ease; }
         .lightbox.show .lightbox-img { transform: scale(1); opacity: 1; }
         
-        /* Simple Windows-style Close Button */
-        .lightbox-close { 
+        /* Reverted buttons back to PERFECT CIRCLES, kept Windows Photos clean hover styling */
+        .lightbox-close, .lightbox-nav { 
             position: absolute; display: flex; align-items: center; justify-content: center; 
-            width: 48px; height: 48px; background: transparent; border: none; 
-            cursor: pointer; z-index: 4001; transition: color 0.15s ease; color: #ffffff; 
-            top: 16px; right: 16px;
+            width: 48px; height: 48px; background: transparent; border: none; border-radius: 50%;
+            cursor: pointer; z-index: 4001; transition: all 0.15s ease; color: #ffffff; 
         }
-        .lightbox-close:hover { color: #f23645; }
         
-        /* Windows Photos Style Circular Navigation Arrows */
-        .lightbox-nav { 
-            position: absolute; display: flex; align-items: center; justify-content: center; 
-            width: 44px; height: 44px; background: rgba(30, 30, 30, 0.5); border: none; border-radius: 50%;
-            cursor: pointer; z-index: 4001; transition: background 0.15s ease; color: #ffffff; 
-            top: 50%; transform: translateY(-50%); opacity: 0; visibility: hidden; 
-        }
+        .lightbox-close { top: 16px; right: 16px; }
+        .lightbox-close:hover { color: #f23645; } /* Only the X icon turns red */
+        
+        .lightbox-nav { top: 50%; transform: translateY(-50%); opacity: 0; visibility: hidden; }
         .lightbox.show .lightbox-nav.visible { opacity: 1; visibility: visible; }
-        .lightbox-prev { left: 24px; }
-        .lightbox-next { right: 24px; }
-        .lightbox-nav:hover { background: rgba(60, 60, 60, 0.8); }
-        .lightbox-nav:active { background: rgba(80, 80, 80, 0.9); transform: translateY(-50%) scale(0.96); }
+        .lightbox-prev { left: 16px; }
+        .lightbox-next { right: 16px; }
+        .lightbox-nav:hover { background: rgba(255, 255, 255, 0.15); } 
+        .lightbox-nav:active { background: rgba(255, 255, 255, 0.1); transform: translateY(-50%) scale(0.96); }
         
         .lightbox-indicator { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); color: var(--text-main); background: transparent; padding: 6px 16px; font-size: 13px; font-weight: 500; z-index: 4001; display: none; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
     </style>
@@ -366,13 +359,13 @@
             </svg>
         </button>
         <button class="lightbox-nav lightbox-prev" id="lightboxPrev">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 18l-6-6 6-6"></path>
             </svg>
         </button>
         <img src="" alt="Chart" class="lightbox-img" id="lightboxImg">
         <button class="lightbox-nav lightbox-next" id="lightboxNext">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 18l6-6-6-6"></path>
             </svg>
         </button>
@@ -428,11 +421,15 @@
         <div class="modal">
             <div class="modal-header"><h2 id="modalTitle">Log a Trade</h2><button class="close-btn" id="closeModalBtn">&times;</button></div>
             <form id="tradeForm">
+                
+                <!-- Fixed Calendar Icon Alignment Here -->
                 <div class="form-row">
-                    <div class="form-group" style="position: relative;">
+                    <div class="form-group">
                         <label>Date</label>
-                        <svg style="position: absolute; left: 10px; top: 34px; color: var(--text-muted); z-index: 10;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        <input type="text" id="tradeDate" required style="padding-left: 36px; cursor: pointer; background-color: var(--bg-color);" placeholder="Select Date">
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <svg style="position: absolute; left: 10px; color: var(--text-muted); z-index: 10; pointer-events: none;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <input type="text" id="tradeDate" required style="padding-left: 36px; cursor: pointer; background-color: var(--bg-color); width: 100%;" placeholder="Select Date">
+                        </div>
                     </div>
                     <div class="form-group"><label>Asset / Pair</label><input type="text" id="tradeAsset" placeholder="e.g. BTC/INR or RELIANCE" required></div>
                 </div>
@@ -573,7 +570,6 @@
             setupDatePicker();
             setupFilterBar();
             
-            // Auto fetch from cloud quietly if configured
             if (feeSettings.sheetUrl && feeSettings.sheetUrl.trim() !== '') {
                 pullFromGoogleSheetsSilent();
             }
@@ -993,7 +989,6 @@
         }
 
         // ====== CLOUD SYNC FUNCTIONS ====== //
-        // To avoid CORS Preflight blocks, we send POSTs as simple strings without Content-Type header.
         
         function syncToGoogleSheets(dataObj, action) {
             if (!feeSettings.sheetUrl) return; 
@@ -1008,7 +1003,6 @@
                     payload = { action: 'save', data: safeData };
                 }
                 
-                // Pure stringify body without explicit JSON header avoids preflight CORS checks on Google Servers.
                 fetch(feeSettings.sheetUrl, {
                     method: 'POST',
                     body: JSON.stringify(payload),
