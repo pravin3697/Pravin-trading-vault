@@ -106,7 +106,7 @@
 
         /* Main Tabs Layout */
         .tabs { display: flex; gap: 12px; margin-bottom: 24px; }
-        .tab { padding: 10px 20px; cursor: pointer; border-radius: 6px; font-weight: 500; color: var(--text-muted); transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; background: rgba(19, 23, 34, 0.6); border: 1px solid var(--border-color); }
+        .tab { padding: 10px 20px; cursor: pointer; border-radius: 6px; font-weight: 400; color: var(--text-muted); transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; background: rgba(19, 23, 34, 0.6); border: 1px solid var(--border-color); }
         
         .tab:hover:not(.active) { 
             background-color: rgba(0, 229, 255, 0.02); border-color: rgba(0, 229, 255, 0.2); 
@@ -115,7 +115,7 @@
 
         .tab.active { 
             background-color: rgba(0, 229, 255, 0.08) !important; border: 1px solid rgba(0, 229, 255, 0.5) !important; 
-            box-shadow: 0 4px 12px rgba(0, 229, 255, 0.15) !important; color: #ffffff !important; font-weight: 500 !important; 
+            box-shadow: 0 4px 12px rgba(0, 229, 255, 0.15) !important; color: #ffffff !important; font-weight: 400 !important; 
         }
 
         /* UNIFIED SEARCH & FILTER BAR */
@@ -418,14 +418,21 @@
 
     <div class="lightbox" id="lightbox">
         <div class="lightbox-close" id="lightboxClose">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
         </div>
         <div class="lightbox-nav lightbox-prev" id="lightboxPrev">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
         </div>
         <img src="" alt="Chart" class="lightbox-img" id="lightboxImg">
         <div class="lightbox-nav lightbox-next" id="lightboxNext">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
         </div>
         <div class="lightbox-indicator" id="lightboxIndicator">1 / 2</div>
     </div>
