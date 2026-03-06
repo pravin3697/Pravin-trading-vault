@@ -1,21 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Trading Vault</title>
-    
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 5 L88.97 27.5 L88.97 72.5 L50 95 L11.03 72.5 L11.03 27.5 Z' fill='none' stroke='%2300e5ff' stroke-width='6' stroke-linejoin='round'/><circle cx='50' cy='50' r='26' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-dasharray='4 4' opacity='0.6'/><circle cx='50' cy='50' r='18' fill='none' stroke='%2300e5ff' stroke-width='2' opacity='0.8'/><path d='M32 62 L45 50 L52 56 L66 40' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><path d='M56 40 L66 40 L66 50' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Trading Vault</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <!-- UPDATED FAVICON: Replaced bright cyan with Dark Neon Cyan (%230097a7) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 5 L88.97 27.5 L88.97 72.5 L50 95 L11.03 72.5 L11.03 27.5 Z' fill='none' stroke='%230097a7' stroke-width='6' stroke-linejoin='round'/><circle cx='50' cy='50' r='26' fill='none' stroke='%230097a7' stroke-width='2' stroke-dasharray='4 4' opacity='0.6'/><circle cx='50' cy='50' r='18' fill='none' stroke='%230097a7' stroke-width='2' opacity='0.8'/><path d='M32 62 L45 50 L52 56 L66 40' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><path d='M56 40 L66 40 L66 50' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+  <style>
+    /* =========================================================
+       1. UNIVERSAL SCROLLBAR FIX (Forces sleek scrollbars everywhere)
+       ========================================================= */
     
-    <style>
+    /* Firefox Support */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #374151 transparent;
+    }
+
+    /* WebKit (Chrome, Edge, Safari, Brave) */
+    ::-webkit-scrollbar {
+      width: 8px;   /* Width for vertical scrollbars */
+      height: 8px;  /* Height for horizontal scrollbars */
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0b0f15; /* Matches your dark background perfectly */
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #2a3645; /* Sleek dark grey resting state */
+      border-radius: 6px;
+      border: 2px solid #0b0f15; /* Creates a clean "padding" effect around the thumb */
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: #0097a7; /* Glows with the new Dark Neon Cyan when hovered! */
+    }
+
         :root {
             --bg-color: #0b0e14;
             --panel-bg: transparent; 
@@ -27,7 +58,7 @@
             --profit-green: #089981;
             --loss-red: #f23645;
             --warning-yellow: #eeb422;
-            --accent-neon: #00e5ff; 
+            --accent-neon: #0097a7; 
             --font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
         }
 
@@ -51,7 +82,7 @@
         .brand { display: flex; align-items: center; gap: 12px; cursor: pointer; transition: opacity 0.2s; }
         .brand:hover { opacity: 0.8; }
         
-        .vault-logo { width: 36px; height: 36px; display: inline-block; vertical-align: middle; filter: drop-shadow(0px 0px 4px rgba(0, 229, 255, 0.4)); transition: transform 0.3s ease; }
+        .vault-logo { width: 36px; height: 36px; display: inline-block; vertical-align: middle; filter: drop-shadow(0px 0px 4px rgba(0, 229, 167, 0.8)); transition: transform 0.3s ease; }
         .vault-logo:hover { transform: scale(1.05); }
         .vault-hexagon { fill: none; stroke: #00e5ff; stroke-width: 6; stroke-linejoin: round; }
         .vault-ring-dashed { fill: none; stroke: #00e5ff; stroke-width: 2; stroke-dasharray: 4 4; opacity: 0.6; }
@@ -1119,19 +1150,66 @@
 
             if (window.pnlChartInstance) window.pnlChartInstance.destroy();
 
-            const isProfitable = runningPnl >= 0;
-            const lineColor = isProfitable ? '#089981' : '#f23645'; 
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, isProfitable ? 'rgba(8, 153, 129, 0.4)' : 'rgba(242, 54, 69, 0.4)');
-            gradient.addColorStop(1, isProfitable ? 'rgba(8, 153, 129, 0)' : 'rgba(242, 54, 69, 0)');
+           const isProfitable = runningPnl >= 0;
+const lineColor = isProfitable ? '#089981' : '#dc2626';
+const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+gradient.addColorStop(0, isProfitable ? 'rgba(5, 150, 105, 0.4)' : 'rgba(220, 38, 38, 0.4)');
+gradient.addColorStop(1, isProfitable ? 'rgba(5, 150, 105, 0)' : 'rgba(220, 38, 38, 0)');
 
             window.pnlChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: { labels: labels, datasets:[{ data: dataPoints, borderColor: lineColor, backgroundColor: gradient, borderWidth: 2, pointRadius: 0, pointHoverRadius: 6, pointHoverBackgroundColor: lineColor, pointHoverBorderColor: '#fff', fill: true, tension: 0.3 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(19, 23, 34, 0.9)', titleColor: '#787b86', bodyColor: '#d1d4dc', borderColor: '#2a2e39', borderWidth: 1, padding: 10, displayColors: false, callbacks: { label: function(context) { return 'Net P&L: ₹' + context.parsed.y.toFixed(2); } } } }, scales: { x: { display: false }, y: { display: true, position: 'right', grid: { color: 'rgba(42, 46, 57, 0.5)' }, border: { display: false }, ticks: { color: '#787b86', font: { size: 11 }, maxTicksLimit: 6 } } }, interaction: { mode: 'nearest', axis: 'x', intersect: false } }
-            });
-        }
-
+            type: 'line',
+            data: { 
+                labels: labels, 
+                datasets:[{ 
+                    label: 'Net P&L', 
+                    data: dataPoints, 
+                    borderColor: lineColor, 
+                    backgroundColor: gradient, 
+                    borderWidth: 2, 
+                    pointRadius: 0, 
+                    pointHoverRadius: 6, 
+                    pointHoverBackgroundColor: lineColor, 
+                    pointHoverBorderColor: '#fff', 
+                    fill: true, 
+                    tension: 0.3 
+                }] 
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { 
+                    legend: { 
+                        display: false 
+                    }, 
+                    tooltip: { 
+                        backgroundColor: 'rgba(19, 23, 34, 0.9)', 
+                        titleColor: '#787b86', 
+                        bodyColor: '#d1d4dc', 
+                        borderColor: '#2a2e39', 
+                        borderWidth: 1, 
+                        padding: 10, 
+                        displayColors: false, 
+                        callbacks: { 
+                            label: function(context) { 
+                                return 'Net P&L: ₹' + context.parsed.y.toFixed(2); 
+                            } 
+                        } 
+                    } 
+                }, 
+                scales: { 
+                    x: { display: false }, 
+                    y: { 
+                        display: true, 
+                        position: 'right', 
+                        grid: { color: 'rgba(42, 46, 57, 0.5)' }, 
+                        border: { display: false }, 
+                        ticks: { color: '#787b86', font: { size: 11 }, maxTicksLimit: 6 } 
+                    } 
+                }, 
+                interaction: { mode: 'nearest', axis: 'x', intersect: false } 
+            }
+        });
+    }
         function updateStats() {
             const executedTrades = trades.filter(t => !t.isSetupOnly && !t.isMissed);
             const missedTrades = trades.filter(t => t.isMissed);
