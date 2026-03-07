@@ -120,12 +120,13 @@
         .chart-header { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .chart-container { position: relative; flex: 1; width: 100%; min-height: 240px; } 
 
-        .edge-panel { position: relative; grid-column: span 1; background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; min-width: 0; transition: all 0.3s ease; }
+        /* Adjusted edge-panel to support inner scrolling with sticky title and capped height matching chart */
+        .edge-panel { position: relative; grid-column: span 1; background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 0 16px 16px 16px; display: flex; flex-direction: column; min-width: 0; transition: all 0.3s ease; max-height: 310px; overflow-y: auto; }
         .edge-panel::-webkit-scrollbar { width: 4px; }
         .edge-panel::-webkit-scrollbar-track { background: transparent; }
         .edge-panel::-webkit-scrollbar-thumb { background: rgba(0, 151, 167, 0.2); border-radius: 4px; }
         .edge-panel:hover { border-color: rgba(0, 151, 167, 0.4); box-shadow: 0 6px 16px rgba(0, 151, 167, 0.08); } 
-        .edge-panel-title { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .edge-panel-title { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background-color: var(--bg-color); padding: 16px 0; margin-top: 0; z-index: 10; }
         
         .edge-section { margin-bottom: 20px; }
         .edge-section:last-child { margin-bottom: 0; }
@@ -141,23 +142,6 @@
         .edge-item:last-child { margin-bottom: 0; }
         .edge-item-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
         .edge-item-stats { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-muted); }
-
-        /* Absolute Dropdown overlay for Advanced Settings. Doesn't push chart layout! */
-        .adv-panel { 
-            position: absolute; top: calc(100% + 8px); left: 0; right: 0; 
-            background: rgba(11, 14, 20, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            opacity: 0; visibility: hidden; transform: translateY(-8px); 
-            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s, border-color 0.3s ease; z-index: 2000; 
-        }
-        .adv-panel.open { 
-            opacity: 1; visibility: visible; transform: translateY(0); 
-            border-color: rgba(0, 151, 167, 0.4); 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 6px 16px rgba(0, 151, 167, 0.08); 
-        }
-        #advToggleIcon { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .adv-toggle-open #advToggleIcon { transform: rotate(180deg); color: var(--accent-neon); }
 
         /* Reverted Tabs Flex Config: Locks perfectly inline with Search Filter */
         .tabs { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: nowrap; }
@@ -325,7 +309,7 @@
 
         /* Flatpickr Customization - Separated Month & Year */
         .flatpickr-calendar { background: rgba(11, 14, 20, 0.95) !important; backdrop-filter: blur(16px) !important; border: 1px solid var(--border-color) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important; font-family: var(--font-family) !important; }
-        .flatpickr-current-month { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 0 12px !important; width: 100% !important; left: 0 !important; height: 36px !important; }
+        .flatpickr-current-month { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 0 40px !important; width: 100% !important; left: 0 !important; height: 36px !important; }
         .flatpickr-current-month .cur-month { font-weight: 600 !important; color: var(--text-main) !important; text-align: left !important; margin: 0 !important; }
         .flatpickr-current-month .numInputWrapper { width: auto !important; margin: 0 !important; }
         .flatpickr-current-month input.cur-year { font-weight: 600 !important; color: var(--text-main) !important; text-align: right !important; padding: 0 !important; }
@@ -334,11 +318,12 @@
         .flatpickr-day:hover { background: rgba(0, 151, 167, 0.1) !important; border-color: rgba(0, 151, 167, 0.3) !important; color: var(--accent-neon) !important; }
         .flatpickr-day.selected { background: rgba(0, 151, 167, 0.2) !important; border: 1px solid var(--accent-neon) !important; }
         .flatpickr-day.holiday-date { border-bottom: 2px solid rgba(242, 54, 69, 0.4) !important; font-weight: 500 !important; }
-        .flatpickr-months .flatpickr-prev-month svg, .flatpickr-months .flatpickr-next-month svg { fill: #ffffff !important; transition: fill 0.2s ease; }
-        .flatpickr-months .flatpickr-prev-month:hover svg, .flatpickr-months .flatpickr-next-month:hover svg { fill: var(--accent-neon) !important; }
+        .flatpickr-months .flatpickr-prev-month svg, .flatpickr-months .flatpickr-next-month svg { fill: var(--accent-neon) !important; transition: all 0.2s ease; }
+        .flatpickr-months .flatpickr-prev-month:hover svg, .flatpickr-months .flatpickr-next-month:hover svg { fill: var(--accent-neon) !important; filter: drop-shadow(0 0 4px rgba(0, 151, 167, 0.6)); }
         .flatpickr-weekday { color: var(--text-muted) !important; }
         .flatpickr-time input { color: var(--text-main) !important; background: transparent !important; }
-        .flatpickr-time .flatpickr-time-separator, .flatpickr-time .flatpickr-am-pm { color: var(--text-main) !important; }
+        .flatpickr-time .flatpickr-time-separator { color: var(--accent-neon) !important; }
+        .flatpickr-time .flatpickr-am-pm { color: var(--text-main) !important; }
 
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
         .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; font-weight: 600; }
@@ -444,9 +429,6 @@
             <div class="edge-panel">
                 <div class="edge-panel-title">
                     <span>Edge Analytics</span>
-                    <button type="button" id="toggleAdvancedEdge" style="background:transparent; border:none; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; transition:color 0.2s;" title="Toggle Advanced Analytics">
-                        <svg id="advToggleIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </button>
                 </div>
                 
                 <div class="edge-section">
@@ -463,9 +445,9 @@
                     <div id="setupEdgeList" class="setup-edge-list"></div>
                 </div>
 
-                <!-- Advanced Analytics Absolute Overlay Panel -->
-                <div id="advancedAnalytics" class="adv-panel">
-                    <div class="edge-section" style="display: flex; flex-direction: column;">
+                <!-- Advanced Analytics (Now integrated, no longer an overlay) -->
+                <div id="advancedAnalytics">
+                    <div class="edge-section" style="display: flex; flex-direction: column; margin-top: 20px;">
                         <div class="edge-title-sm" style="margin-bottom: 12px;">Other Setups</div>
                         <div id="advancedSetupEdgeList" class="setup-edge-list"></div>
                     </div>
@@ -775,34 +757,6 @@
 
     <script>
         const placeholderImg = 'https://via.placeholder.com/800x400/131722/787b86?text=No+Chart+Provided';
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            // Advanced Analytics Absolute Overlay Toggle
-            const toggleAdv = document.getElementById('toggleAdvancedEdge');
-            if (toggleAdv) {
-                toggleAdv.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const adv = document.getElementById('advancedAnalytics');
-                    if (adv.classList.contains('open')) {
-                        adv.classList.remove('open');
-                        toggleAdv.classList.remove('adv-toggle-open');
-                    } else {
-                        adv.classList.add('open');
-                        toggleAdv.classList.add('adv-toggle-open');
-                    }
-                });
-            }
-
-            // Close advanced panel if clicked outside
-            document.addEventListener('click', function(e) {
-                const adv = document.getElementById('advancedAnalytics');
-                const toggle = document.getElementById('toggleAdvancedEdge');
-                if (adv && adv.classList.contains('open') && !adv.contains(e.target) && !toggle.contains(e.target)) {
-                    adv.classList.remove('open');
-                    toggle.classList.remove('adv-toggle-open');
-                }
-            });
-        });
         
         let trades =[];
         try {
