@@ -1,8 +1,10 @@
-const CACHE_NAME = 'trading-vault-v1';
+const CACHE_NAME = 'trading-vault-v2';
 const ASSETS =[
   './',
   './index.html',
   './manifest.json',
+  './icon-192.png',  // <-- Add the new icon to the offline cache
+  './icon-512.png',  // <-- Add the new icon to the offline cache
   'https://cdn.jsdelivr.net/npm/chart.js',
   'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
   'https://cdn.jsdelivr.net/npm/flatpickr'
