@@ -1,10 +1,10 @@
-const CACHE_NAME = 'trading-vault-v2';
+const CACHE_NAME = 'trading-vault-v2'; // Changed to v2 to force update
 const ASSETS =[
   './',
   './index.html',
   './manifest.json',
-  './icon-192.png',  // <-- Add the new icon to the offline cache
-  './icon-512.png',  // <-- Add the new icon to the offline cache
+  './icon-192.png',
+  './icon-512.png',
   'https://cdn.jsdelivr.net/npm/chart.js',
   'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
   'https://cdn.jsdelivr.net/npm/flatpickr'
@@ -20,7 +20,14 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(clients.claim());
+  // This deletes the old v1 cache so the new files load
+  e.waitUntil(
+    caches.keys().then(keys => {
+      return Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      );
+    }).then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', e => {
@@ -28,7 +35,6 @@ self.addEventListener('fetch', e => {
     caches.match(e.request).then(cachedResponse => {
       return cachedResponse || fetch(e.request);
     }).catch(() => {
-      // Failsafe for offline loading
       return new Response('Offline Mode');
     })
   );
