@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0b0e14">
-  <title>The Trading Vault</title>
+  <title>Zero Ledger</title>
 
   <!-- PWA Manifest & iOS Support -->
   <link rel="manifest" href="manifest.json">
@@ -593,7 +592,7 @@
                   <path d="M32 62 L45 50 L52 56 L66 40" class="trading-trend" />
                   <path d="M56 40 L66 40 L66 50" class="trading-trend" />
                 </svg>
-                <h1>The Trading <span class="accent-text">Vault</span></h1>
+                <h1>Zero <span class="accent-text">Ledger</span></h1>
             </div>
             
             <div class="header-actions">
@@ -949,6 +948,27 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- NEW: Setup Grade Field -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Setup Grade</label>
+                        <div class="custom-select-wrapper" id="gradeDropdownWrapper">
+                            <div class="custom-select-trigger">
+                                <span class="trigger-text">A-Grade</span>
+                                <span class="chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+                            </div>
+                            <div class="custom-select-options">
+                                <div class="custom-option selected" data-value="A-Grade">A-Grade</div>
+                                <div class="custom-option" data-value="B-Grade">B-Grade</div>
+                                <div class="custom-option" data-value="C-Grade">C-Grade</div>
+                            </div>
+                            <input type="hidden" id="tradeGrade" value="A-Grade">
+                        </div>
+                    </div>
+                    <!-- Empty spacer to maintain your 2-column flexbox design -->
+                    <div class="form-group"></div> 
+                </div>
                 
                 <div id="tradeExecutionFields">
                     <div class="form-row">
@@ -972,9 +992,29 @@
                         <div class="form-group"><label>Entry Price</label><input type="number" step="any" id="tradeEntry" placeholder="0.00"></div>
                         <div class="form-group"><label>Stoploss (Optional)</label><input type="number" step="any" id="tradeSl" placeholder="0.00"></div>
                     </div>
+
+                    <!-- NEW: Dynamic Partial Exits Container -->
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label>Partial Exits (Exit Price & Quantity)</label>
+                        <div id="exitsContainer">
+                            <div class="form-row exit-row" style="margin-bottom: 8px; gap: 8px;">
+                                <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                                    <input type="number" step="any" class="exit-price" placeholder="Exit Price" required>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                                    <input type="number" step="any" class="exit-qty" placeholder="Exit Qty" required>
+                                </div>
+                                <button type="button" class="btn-icon-action remove-exit-btn" style="height: 38px; width: 38px; flex-shrink: 0;" title="Remove Exit">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-text" id="addExitBtn" style="color: var(--accent-neon); margin-top: 4px;">+ Add Another Exit</button>
+                    </div>
+
                     <div class="form-row">
-                        <div class="form-group"><label>Exit Price</label><input type="number" step="any" id="tradeExit" placeholder="0.00"></div>
                         <div class="form-group"><label>Total Fees (₹)</label><input type="number" step="any" id="tradeFees" placeholder="Auto-calculated (Edit manually)"></div>
+                        <div class="form-group"></div> <!-- Spacer -->
                     </div>
                 </div>
 
@@ -1013,15 +1053,15 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, getDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
+     
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyAUOkoJNEzc1fzAV4Uul_uYpxf9a_gLDPY",
-            authDomain: "the-trading-vault.firebaseapp.com",
-            projectId: "the-trading-vault",
-            storageBucket: "the-trading-vault.firebasestorage.app",
-            messagingSenderId: "398304930833",
-            appId: "1:398304930833:web:c000cfe4cca7d3de7d55b0"
+          apiKey: "AIzaSyCXAdA4bKaIdB8WkaWeXitKgoLRgGKT8rM",
+          authDomain: "zledger.web.app",
+          projectId: "zeroledger-6e36c",
+          storageBucket: "zeroledger-6e36c.firebasestorage.app",
+          messagingSenderId: "638398949127",
+          appId: "1:638398949127:web:2558326cb2a282480347a2"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -1041,6 +1081,7 @@
             if (!Array.isArray(trades)) trades =[];
         } catch (e) { trades =[]; }
 
+        // Data mapping for legacy backwards-compatibility 
         trades = trades.map(t => {
             if(t.image !== undefined) { t.image1 = t.image; delete t.image; }
             if(t.image2 === undefined) t.image2 = '';
@@ -1048,6 +1089,16 @@
             if(t.isMissed === undefined) t.isMissed = false;
             if(t.tags === undefined) t.tags =[];
             if(t.regime === undefined) t.regime = 'N/A';
+            if(t.grade === undefined) t.grade = 'A-Grade'; // Setup Grade fallback
+            
+            // Migrate single exit to Partial Exits array fallback
+            if(t.exitsList === undefined) {
+                if (t.exit !== undefined && t.exit !== '') {
+                    t.exitsList = [{ price: parseFloat(t.exit), qty: parseFloat(t.qty || 0) }];
+                } else {
+                    t.exitsList =[];
+                }
+            }
             return t;
         });
 
@@ -1098,6 +1149,91 @@
         let customTags = JSON.parse(localStorage.getItem('pravinCustomTags')) ||[];
         let allTags =[...new Set([...defaultTags, ...customTags])];
         let activeTags =[];
+
+        /** 
+         * ==========================================
+         * PARTIAL EXITS MATH ENGINE & DYNAMIC UI
+         * ========================================== 
+         */
+
+        // Add new exit batch row
+        document.getElementById('addExitBtn').addEventListener('click', () => {
+            const container = document.getElementById('exitsContainer');
+            const row = document.createElement('div');
+            row.className = 'form-row exit-row';
+            row.style.cssText = 'margin-bottom: 8px; gap: 8px;';
+            
+            // Check if we are in "Setup" mode to safely remove required attributes
+            const logTypeEl = document.getElementById('tradeLogType');
+            const isSetup = (logTypeEl && logTypeEl.value === 'Setup');
+            const reqAttr = isSetup ? '' : 'required';
+
+            row.innerHTML = `
+                <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                    <input type="number" step="any" class="exit-price" placeholder="Exit Price" ${reqAttr}>
+                </div>
+                <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                    <input type="number" step="any" class="exit-qty" placeholder="Exit Qty" ${reqAttr}>
+                </div>
+                <button type="button" class="btn-icon-action remove-exit-btn" style="height: 38px; width: 38px; flex-shrink: 0;" title="Remove Exit">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            `;
+            container.appendChild(row);
+        });
+
+        // Remove exit batch row (Event Delegation)
+        document.getElementById('exitsContainer').addEventListener('click', (e) => {
+            const btn = e.target.closest('.remove-exit-btn');
+            if (btn) {
+                const rows = document.querySelectorAll('.exit-row');
+                if (rows.length > 1) {
+                    btn.closest('.exit-row').remove();
+                    // Manually trigger input event to recalculate fees if needed
+                    document.getElementById('tradeExecutionFields').dispatchEvent(new Event('input'));
+                } else {
+                    alert("You must log at least one exit.");
+                }
+            }
+        });
+
+        // Loop through batches to calculate Total Gross P&L and Blended Price
+        function calculatePartialExits() {
+            const entryPrice = parseFloat(document.getElementById('tradeEntry').value);
+            const direction = document.getElementById('tradeDirection').value;
+            
+            let totalExitQty = 0;
+            let totalExitVolume = 0; 
+            let grossPnl = 0;
+            let exitList =[]; // Saves the partial splits array to the DB
+
+            const rows = document.querySelectorAll('.exit-row');
+            rows.forEach(row => {
+                const price = parseFloat(row.querySelector('.exit-price').value);
+                const qty = parseFloat(row.querySelector('.exit-qty').value);
+
+                if (!isNaN(price) && !isNaN(qty) && qty > 0) {
+                    exitList.push({ price, qty });
+                    totalExitQty += qty;
+                    totalExitVolume += (price * qty);
+
+                    if (!isNaN(entryPrice)) {
+                        // Batch-by-batch Math
+                        if (direction === 'Long') {
+                            grossPnl += (price - entryPrice) * qty;
+                        } else {
+                            grossPnl += (entryPrice - price) * qty;
+                        }
+                    }
+                }
+            });
+
+            // Average Blended Exit Price = (Price1*Qty1 + Price2*Qty2) / Total Qty
+            const blendedExitPrice = totalExitQty > 0 ? (totalExitVolume / totalExitQty) : 0;
+
+            return { blendedExitPrice, totalExitQty, grossPnl, exitList };
+        }
+
 
         // FIREBASE AUTH & SYNC LOGIC
         document.getElementById('loginBtn').addEventListener('click', () => {
@@ -1171,7 +1307,7 @@
             } catch(e) { console.error("Settings load error", e); }
         }
 
-        // IMGBB UPLOADER
+        // IMGBB UPLOADER (FRONTEND - 100% FREE)
         async function processAndUploadImage(base64Data) {
             if (!base64Data || !base64Data.startsWith('data:image')) return base64Data; 
             updateSyncStatusUI('syncing');
@@ -1497,12 +1633,20 @@
             const execFields = document.getElementById('tradeExecutionFields');
             const isSetup = (logType === 'Setup');
             
-            execFields.style.display = isSetup ? 'none' : 'block';['tradeEntry', 'tradeExit', 'tradeQty'].forEach(id => {
+            execFields.style.display = isSetup ? 'none' : 'block';
+            
+            ['tradeEntry', 'tradeQty'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.required = !isSetup;
-            });['tradeSl', 'tradeFees'].forEach(id => {
+            });
+            ['tradeSl', 'tradeFees'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.required = false; 
+            });
+
+            // Toggle required for dynamic exit fields safely
+            document.querySelectorAll('.exit-price, .exit-qty').forEach(el => {
+                el.required = !isSetup;
             });
         }
 
@@ -2019,30 +2163,34 @@
         }
 
         function setupAutoFeeCalc() {
-            const inputs =['tradeEntry', 'tradeExit', 'tradeQty'];
-            inputs.forEach(id => {
-                document.getElementById(id).addEventListener('input', () => {
-                    const logTypeEl = document.getElementById('tradeLogType');
-                    if(logTypeEl && logTypeEl.value === 'Setup') return;
-                    
-                    const entry = parseFloat(document.getElementById('tradeEntry').value);
-                    const exit = parseFloat(document.getElementById('tradeExit').value);
-                    const qty = parseFloat(document.getElementById('tradeQty').value);
-
-                    if (!isNaN(entry) && !isNaN(exit) && !isNaN(qty) && qty > 0) {
-                        const b = parseFloat(feeSettings.brokerage) || 0;
-                        const stt = (parseFloat(feeSettings.stt) || 0) / 100;
-                        const exch = (parseFloat(feeSettings.exch) || 0) / 100;
-                        const gst = (parseFloat(feeSettings.gst) || 0) / 100;
-
-                        const turnover = (entry * qty) + (exit * qty);
-                        const exchCharges = turnover * exch;
-                        const calcFee = b + (exit * qty * stt) + exchCharges + ((b + exchCharges) * gst);
+            const execFields = document.getElementById('tradeExecutionFields');
+            if(execFields) {
+                execFields.addEventListener('input', (e) => {
+                    if(e.target.id === 'tradeEntry' || e.target.id === 'tradeQty' || e.target.classList.contains('exit-price') || e.target.classList.contains('exit-qty')) {
+                        const logTypeEl = document.getElementById('tradeLogType');
+                        if(logTypeEl && logTypeEl.value === 'Setup') return;
                         
-                        document.getElementById('tradeFees').value = calcFee.toFixed(2);
+                        const entry = parseFloat(document.getElementById('tradeEntry').value);
+                        const qty = parseFloat(document.getElementById('tradeQty').value); // Global planned qty
+                        
+                        const exitsData = typeof calculatePartialExits === 'function' ? calculatePartialExits() : { blendedExitPrice: 0 };
+                        const exit = exitsData.blendedExitPrice;
+                        
+                        if (!isNaN(entry) && !isNaN(exit) && !isNaN(qty) && qty > 0 && exit > 0) {
+                            const b = parseFloat(feeSettings.brokerage) || 0;
+                            const stt = (parseFloat(feeSettings.stt) || 0) / 100;
+                            const exch = (parseFloat(feeSettings.exch) || 0) / 100;
+                            const gst = (parseFloat(feeSettings.gst) || 0) / 100;
+
+                            const turnover = (entry * qty) + (exit * qty);
+                            const exchCharges = turnover * exch;
+                            const calcFee = b + (exit * qty * stt) + exchCharges + ((b + exchCharges) * gst);
+                            
+                            document.getElementById('tradeFees').value = calcFee.toFixed(2);
+                        }
                     }
                 });
-            });
+            }
         }
 
         let pastedImages = { 1: '', 2: '' };
@@ -2117,21 +2265,25 @@
             
             let calcPnl = '', calcRRR = '';
             
+            let grade = document.getElementById('tradeGrade') ? document.getElementById('tradeGrade').value : 'A-Grade';
             let dir = document.getElementById('tradeDirection').value;
             let setup = document.getElementById('tradeSetup').value;
             let regime = document.getElementById('tradeRegime').value;
             
             let rawQty = document.getElementById('tradeQty').value;
-            let rawEntry = document.getElementById('tradeEntry').value, rawSl = document.getElementById('tradeSl').value, rawExit = document.getElementById('tradeExit').value;
+            let rawEntry = document.getElementById('tradeEntry').value, rawSl = document.getElementById('tradeSl').value;
+            
+            // MATH ENGINE OVERRIDE FOR PARTIAL EXITS
+            const exitsData = calculatePartialExits();
+            let rawExit = exitsData.totalExitQty > 0 ? exitsData.blendedExitPrice : '';
             let rawFees = document.getElementById('tradeFees').value;
             
             if (!isSetup) {
                 let entry = parseFloat(rawEntry), sl = parseFloat(rawSl), exit = parseFloat(rawExit), qty = parseFloat(rawQty);
                 let fees = parseFloat(rawFees) || 0;
                 
-                if (!isNaN(entry) && !isNaN(exit) && !isNaN(qty)) { 
-                    let grossPnl = dir === 'Long' ? (exit - entry) * qty : (entry - exit) * qty; 
-                    calcPnl = grossPnl - fees;
+                if (!isNaN(entry) && !isNaN(exit) && exitsData.totalExitQty > 0) { 
+                    calcPnl = exitsData.grossPnl - fees;
                 }
                 if (!isNaN(entry) && !isNaN(sl) && !isNaN(exit)) {
                     let risk = dir === 'Long' ? (entry - sl) : (sl - entry);
@@ -2160,8 +2312,9 @@
             const tradeData = {
                 id: targetId,
                 date: document.getElementById('tradeDate').value, asset: document.getElementById('tradeAsset').value.toUpperCase(),
-                setup: setup, regime: regime, isSetupOnly: isSetup, isMissed: isMissed,
+                setup: setup, regime: regime, grade: grade, isSetupOnly: isSetup, isMissed: isMissed,
                 direction: isSetup ? '' : dir, qty: isSetup ? '' : rawQty, entry: isSetup ? '' : rawEntry, sl: isSetup ? '' : rawSl, exit: isSetup ? '' : rawExit, 
+                exitsList: isSetup ?[] : exitsData.exitList,
                 fees: isSetup ? '' : (parseFloat(rawFees) || 0), rrr: calcRRR, pnl: calcPnl, image1: finalImg1, image2: finalImg2, notes: document.getElementById('tradeNotes').value,
                 tags:[...activeTags]
             };
@@ -2196,6 +2349,7 @@
             else dateInput.value = t.date; 
             
             document.getElementById('tradeAsset').value = t.asset;
+            setCustomDropdownValue('tradeGrade', t.grade || 'A-Grade');
             setCustomDropdownValue('tradeRegime', t.regime || 'N/A');
             setCustomDropdownValue('tradeSetup', t.setup);
             setCustomDropdownValue('tradeDirection', t.direction || 'Long');
@@ -2208,8 +2362,48 @@
             document.getElementById('tradeQty').value = t.qty || '';
             document.getElementById('tradeEntry').value = t.entry || ''; 
             document.getElementById('tradeSl').value = t.sl || ''; 
-            document.getElementById('tradeExit').value = t.exit || '';
-            document.getElementById('tradeFees').value = t.fees || '';[1, 2].forEach(index => {
+            document.getElementById('tradeFees').value = t.fees || '';
+
+            // Restore Partial Exits
+            const exitsContainer = document.getElementById('exitsContainer');
+            exitsContainer.innerHTML = ''; 
+            if (t.exitsList && t.exitsList.length > 0) {
+                t.exitsList.forEach(exitItem => {
+                    const row = document.createElement('div');
+                    row.className = 'form-row exit-row';
+                    row.style.cssText = 'margin-bottom: 8px; gap: 8px;';
+                    row.innerHTML = `
+                        <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                            <input type="number" step="any" class="exit-price" value="${exitItem.price}" placeholder="Exit Price" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                            <input type="number" step="any" class="exit-qty" value="${exitItem.qty}" placeholder="Exit Qty" required>
+                        </div>
+                        <button type="button" class="btn-icon-action remove-exit-btn" style="height: 38px; width: 38px; flex-shrink: 0;" title="Remove Exit">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    `;
+                    exitsContainer.appendChild(row);
+                });
+            } else {
+                const row = document.createElement('div');
+                row.className = 'form-row exit-row';
+                row.style.cssText = 'margin-bottom: 8px; gap: 8px;';
+                row.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                        <input type="number" step="any" class="exit-price" value="${t.exit || ''}" placeholder="Exit Price" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                        <input type="number" step="any" class="exit-qty" value="${t.qty || ''}" placeholder="Exit Qty" required>
+                    </div>
+                    <button type="button" class="btn-icon-action remove-exit-btn" style="height: 38px; width: 38px; flex-shrink: 0;" title="Remove Exit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                `;
+                exitsContainer.appendChild(row);
+            }
+
+            [1, 2].forEach(index => {
                 const src = t[`image${index}`];
                 if (src && src.startsWith('data:image')) {
                     pastedImages[index] = src;
@@ -2342,7 +2536,9 @@
         
         const closeLb = () => { lightbox.classList.remove('show'); setTimeout(() => lightboxImg.src='', 250); };
         document.getElementById('lightboxClose').addEventListener('click', closeLb); 
-        lightbox.addEventListener('click', (e) => { if(e.target===lightbox || e.target===lightboxImg) closeLb(); });['modalOverlay', 'settingsModalOverlay', 'shortcutsModalOverlay'].forEach(id => {
+        lightbox.addEventListener('click', (e) => { if(e.target===lightbox || e.target===lightboxImg) closeLb(); });
+        
+        ['modalOverlay', 'settingsModalOverlay', 'shortcutsModalOverlay'].forEach(id => {
             document.getElementById(id).addEventListener('click', (e) => { if(e.target.id === id) e.target.style.display = 'none'; });
         });
         
@@ -2355,10 +2551,29 @@
             clearImage(1); clearImage(2); 
             resetTags();
             
+            setCustomDropdownValue('tradeGrade', 'A-Grade');
             setCustomDropdownValue('tradeSetup', 'Head and Shoulders');
             setCustomDropdownValue('tradeRegime', 'N/A');
             setCustomDropdownValue('tradeDirection', 'Long');
             setCustomDropdownValue('tradeLogType', 'Executed');
+
+            // Reset Partial Exits container to 1 blank row
+            const exitsContainer = document.getElementById('exitsContainer');
+            if (exitsContainer) {
+                exitsContainer.innerHTML = `
+                    <div class="form-row exit-row" style="margin-bottom: 8px; gap: 8px;">
+                        <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                            <input type="number" step="any" class="exit-price" placeholder="Exit Price" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                            <input type="number" step="any" class="exit-qty" placeholder="Exit Qty" required>
+                        </div>
+                        <button type="button" class="btn-icon-action remove-exit-btn" style="height: 38px; width: 38px; flex-shrink: 0;" title="Remove Exit">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                `;
+            }
 
             editingTradeId = null; 
             toggleExecutionFields(); 
